@@ -2,7 +2,8 @@
 # Project specific excludes
 #
 
-tomcat
+tomcat/
+tomcat-*/
 
 #
 # Default excludes

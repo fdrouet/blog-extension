@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -eu
+# -e : to stop the script on the first non 0 return
+# -u : stop script if non defined variable is find
 #
 # Utility script to ease the Development process a little bit ;-)
 #
@@ -12,7 +14,7 @@ PLF_DEFAULT_TOMCAT_DIRECTORY=${PLF_TOMCAT_DIRECTORY:-"$PROJECT_DIR/tomcat"}
 PLF_DEFAULT_DATA_DIRECTORY=${PLF_DATA_DIRECTORY:-"$PLF_DEFAULT_TOMCAT_DIRECTORY/gatein/data"}
 
 function script_usage {
-	local ERRMSG=$1
+	local ERRMSG=${1-:""}
 	if [ ! -z "$ERRMSG" ];then echo "# ERROR # ${ERRMSG}"; fi
 	echo "Script usage : "
 	echo "    $0 [-r] [-c] [-t TOMCAT_HOME_DIRECTORY_PATH] [-d PLF_DATA_DIRECTORY_PATH] [-w PLF_WEBAPP_DIRECTORY_PATH]"
@@ -29,6 +31,10 @@ function script_usage {
 	echo "    For exemple you can rebuild the project, update the binaries and restart the tomcat with the following command :"
   echo "       $0 -m -u -r"
 }
+ACTION_RESTART=false
+ACTION_MAVEN=false
+ACTION_UPDATE=false
+ACTION_CLEAN=false
 
 while getopts "rmuct:d:h" OPTION; do
 	case $OPTION in
@@ -135,15 +141,15 @@ if [[ ! -z ${ACTION_UPDATE} && ${ACTION_UPDATE} == "true" ]]; then
   else
     echo " ... no existing war => SKIP"
   fi
-  echo -n "         rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-config-*.jar"
-  rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-config-*.jar
+  echo -n "         rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-extension-config-*.jar"
+  rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-extension-config-*.jar
   echo " ... OK"
 
   # Deploying new binaries
   echo    "  - Adding the new version : "
-  echo -n "         cp -vp ${PROJECT_DIR}/config/target/blog-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/"
+  echo -n "         cp -vp ${PROJECT_DIR}/config/target/blog-extension-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/"
   if [ -d "${PLF_TOMCAT_DIRECTORY}/lib/" ] ; then
-    cp -vp ${PROJECT_DIR}/config/target/blog-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/
+    cp -vp ${PROJECT_DIR}/config/target/blog-extension-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/
     echo " ... OK"
   else
     echo " ... no existing deployed war => SKIP"
